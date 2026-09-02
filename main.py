@@ -276,7 +276,7 @@ class Company():
         db_creation = datetime.date(2026, 8, 29)
         random_days = random.randint(0, (db_creation - start_of_company).days)
         disbursement_date = start_of_company + datetime.timedelta(days=random_days)
-        loan_status = random.choices(self.LOAN_STATUS, weights=[45, 30, 10, 5], k=1)[0]
+        loan_status = random.choices(self.LOAN_STATUS, weights=[45, 30, 5, 5], k=1)[0]
 
         loan = {
             "customer_id": customer_id, "product_id": product_id, "principal": loan_amount, "loan_duration_months": loan_duration,
