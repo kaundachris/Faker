@@ -188,6 +188,20 @@ class Company():
         coo["department_id"] = 5
         self.employees.append(coo)
 
+    def generate_employee_file(self):
+        """Generates the full employee data"""
+        self.sales()
+        self.cx()
+        self.hr()
+        self.finance()
+        self.collections()
+        self.underwriters()
+        self.c_suite()
+        with open("kaunda_ltd_employees.csv", "w", newline="") as file:
+            writer = csv.DictWriter(file, fieldnames=self.EMPLOYEE_FIELDNAMES)
+            writer.writeheader()
+            writer.writerows(self.employees)
+
     def customer(self):
         """Generate the basic details of the customer"""
         asset_value = int(random.triangular(10000, 5000000, 100000))
@@ -207,20 +221,6 @@ class Company():
         for _ in range(no_of_customers):
             customer = self.customer()
             self.customers.append(customer)
-
-    def generate_employee_file(self):
-        """Generates the full employee data"""
-        self.sales()
-        self.cx()
-        self.hr()
-        self.finance()
-        self.collections()
-        self.underwriters()
-        self.c_suite()
-        with open("kaunda_ltd_employees.csv", "w", newline="") as file:
-            writer = csv.DictWriter(file, fieldnames=self.EMPLOYEE_FIELDNAMES)
-            writer.writeheader()
-            writer.writerows(self.employees)
 
     def generate_customer_file(self):
         """Generates the full customer data"""
@@ -276,7 +276,7 @@ class Company():
         db_creation = datetime.date(2026, 8, 29)
         random_days = random.randint(0, (db_creation - start_of_company).days)
         disbursement_date = start_of_company + datetime.timedelta(days=random_days)
-        loan_status = random.choices(self.LOAN_STATUS, weights=[45, 30, 5, 5], k=1)[0]
+        loan_status = random.choices(self.LOAN_STATUS, weights=[60, 30, 8, 2], k=1)[0]
 
         loan = {
             "customer_id": customer_id, "product_id": product_id, "principal": loan_amount, "loan_duration_months": loan_duration,

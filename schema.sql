@@ -5,11 +5,10 @@
 -- ============================================================
 
 -- 1. DEPARTMENTS
--- department_head_id is left nullable and without a FK constraint
--- here because employees doesn't exist yet — departments and
--- employees reference each other (a circular dependency), so we
--- create departments first without the constraint, create
--- employees next, then add the constraint back with ALTER TABLE.
+-- departments and employees reference each other (a circular dependency)
+-- department_head_id is left nullable and without a FK constraint here because employees doesn't exist yet
+-- create departments first without the constraint
+-- create employees next, then add the constraint back with ALTER TABLE.
 CREATE TABLE departments (
     id SERIAL PRIMARY KEY NOT NULL,
     department_name TEXT NOT NULL,
@@ -28,8 +27,7 @@ INSERT INTO departments (department_name, department_head_id, created_at, update
 ('underwriters', NULL, '2026-08-29', '2026-08-29');
 
 -- 2. EMPLOYEES
--- department_id can safely reference departments inline now,
--- since departments already exists with rows.
+-- department_id can safely reference departments inline now, since departments already exists with rows.
 CREATE TABLE employees (
     id SERIAL PRIMARY KEY NOT NULL,
     name TEXT NOT NULL,
@@ -46,14 +44,12 @@ CREATE TABLE employees (
 );
 
 -- >>> Import kaunda_ltd_employees.csv into `employees` here <<<
--- (via Supabase Table Editor's CSV import, or your own loader)
 
 -- Now that employees exists, close the circular dependency:
 ALTER TABLE departments ADD FOREIGN KEY (department_head_id) REFERENCES employees(id);
 
--- Set each department's head to the employee with position = 'head'
--- (or 'ceo' for c_suite) in that department. Adjust department ids
--- below to match your actual departments table if they differ.
+-- Set each department's head to the employee with position = 'head' (or 'ceo' for c_suite) in that department. 
+-- Adjust department ids below to match your actual departments table if they differ.
 UPDATE departments SET department_head_id = (SELECT id FROM employees WHERE department_id = 1 AND position = 'head') WHERE id = 1; -- sales
 UPDATE departments SET department_head_id = (SELECT id FROM employees WHERE department_id = 2 AND position = 'head') WHERE id = 2; -- customer_service
 UPDATE departments SET department_head_id = (SELECT id FROM employees WHERE department_id = 3 AND position = 'head') WHERE id = 3; -- human_resources
@@ -88,13 +84,13 @@ CREATE TABLE products (
     created_at DATE NOT NULL
 );
 
--- Order matters: product_category() in company.py maps risk tiers
--- to product ids assuming this exact insert order (high, medium, low
--- landing on ids 1, 2, 3 respectively).
+-- Order matters:
+-- product_category() in company.py maps risk tiers to product ids assuming this exact insert order
+-- (high, medium, low landing on ids 1, 2, 3 respectively).
 INSERT INTO products (name, risk_tier, interest_rate, created_at) VALUES
 ('saidika_high_risk', 'high', 12.0, '2026-08-29'),
-('saidika_medium_risk', 'medium', 9.0, '2026-08-29'),
-('saidika_low_risk', 'low', 6.0, '2026-08-29');
+('saidika_medium_risk', 'medium', 10.0, '2026-08-29'),
+('saidika_low_risk', 'low', 8.0, '2026-08-29');
 
 -- 5. LOANS
 CREATE TABLE loans (
@@ -115,10 +111,9 @@ CREATE TABLE loans (
 -- >>> Import kaunda_ltd_loans.csv into `loans` here <<<
 
 -- 6. PAYMENTS
--- Deliberately has no customer_id — it's derivable via
--- loan_id -> loans.customer_id, so storing it again here would be
--- a normalization violation (the same value could go stale/
--- contradict itself if a loan's customer_id ever changed).
+-- Deliberately has no customer_id — it's derivable via loan_id -> loans.customer_id
+-- storing it again here would be a normalization violation
+-- the same value could go stale/contradict itself if a loan's customer_id ever changed.
 CREATE TABLE payments (
     id SERIAL PRIMARY KEY NOT NULL,
     loan_id INTEGER NOT NULL,
